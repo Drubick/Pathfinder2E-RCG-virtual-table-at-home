@@ -1,0 +1,105 @@
+{
+	"client_id": "0f0b8bdd04004594a21cece21f7016f9",
+	"client_secret": "f005b76abedf4c0cbeb18c40fe56cb2b",
+	"dm_screen": 0,
+	"map_screen": 0,
+	"scale": 1,
+	"cursor": "images/icons/gui/other/cursor.png",
+	"cursor_inv": "images/icons/gui/spotify/invisible.png",
+	"spotify_logo": "images/icons/spotify.png",
+	"player_screen": {
+		"background": "images/icons/gui/map_background.png",
+		"screen_logo": "images/icons/gui/map_background.png",
+		"static_buttons": {
+			
+		}
+	},
+	"spotify_screen": {
+		"spotify_background": "images/icons/gui/other/blueframe2.png",
+		"playlist_frame": "images/icons/gui/spotify/playlist_border.png",
+		"spotify_buttons": {
+			"next": {
+				"pressed": "images/icons/gui/spotify/next_not_selected.png",
+				"unpressed": "images/icons/gui/spotify/next_not_selected.png",
+				"hover": "images/icons/gui/spotify/next_selected.png",
+				"type": "static",
+				"size": [50, 50],
+				"pos": [530, 40]
+			},
+			"prev": {
+				"pressed": "images/icons/gui/spotify/prev_not_selected.png",
+				"unpressed": "images/icons/gui/spotify/prev_not_selected.png",
+				"hover": "images/icons/gui/spotify/prev_selected.png",
+				"type": "static",
+				"size": [50, 50],
+				"pos": [380, 40]
+			},
+			"play": {
+				"pressed": "images/icons/gui/spotify/invisible.png",
+				"unpressed": "images/icons/gui/spotify/play_not_selected.png",
+				"hover": "images/icons/gui/spotify/play_selected.png",
+				"type": "static",
+				"toggle": true,
+				"size": [75, 75],
+				"pos": [442.5, 27.5]
+			},
+			"pause": {
+				"pressed": "images/icons/gui/spotify/invisible.png",
+				"unpressed": "images/icons/gui/spotify/pause_not_selected.png",
+				"hover": "images/icons/gui/spotify/pause_selected.png",
+				"type": "static",
+				"toggle": true,
+				"size": [75, 75],
+				"pos": [442.5, 27.5]
+			},
+			"playlist_next": {
+				"pressed": "images/icons/gui/pointer_right.png",
+				"unpressed": "images/icons/gui/pointer_right.png",
+				"hover": "images/icons/gui/pointer_right.png",
+				"type": "static",
+				"toggle": false,
+				"size": [100, 100],
+				"pos": [820, 225]
+			},
+			"playlist_prev": {
+				"pressed": "images/icons/gui/pointer_left.png",
+				"unpressed": "images/icons/gui/pointer_left.png",
+				"hover": "images/icons/gui/pointer_left.png",
+				"type": "static",
+				"toggle": false,
+				"size": [100, 100],
+				"pos": [40, 225]
+			}
+		},
+		"playlist_buttons": {
+			"forest": {
+				"icon": "images/icons/gui/playlists/forest.jpg",
+				"playlist_id": "4gFdcp0FkK0p4MC4f9dt1e"
+			},
+			"cathedral": {
+				"icon": "images/icons/gui/playlists/cathedral.jpg",
+				"playlist_id": "7JsuXMXWyxExtFvfUyedyG"
+			},
+			"dungeon": {
+				"icon": "images/icons/gui/playlists/dungeon.jpg",
+				"playlist_id": "0QSFVRFZbb2AehulwKPq3k"
+			},
+			"dark_forest": {
+				"icon": "images/icons/gui/playlists/dark_forest.jpg",
+				"playlist_id": "0EUWfCuELbK6BYOWT1dhUD"
+			},
+			"exploration": {
+				"icon": "images/icons/gui/playlists/exploration.jpg",
+				"playlist_id": "4lNRRQgO5hO9q01e2nduSc"
+			},
+			"tavern": {
+				"icon": "images/icons/gui/playlists/tavern.jpg",
+				"playlist_id": "2Y73njm5d4enXmGuuZokdl"
+			},
+			"battle": {
+				"icon": "images/icons/gui/playlists/battle.jpg",
+				"playlist_id": "7abzyHhYASiOlBKzqlxX6I"
+			}
+		}
+	}
+}

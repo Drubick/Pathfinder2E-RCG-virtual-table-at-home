@@ -1,0 +1,12 @@
+setup.py
+combat_generator/RCG_logic.py
+combat_generator/__init__.py
+combat_generator/utils.py
+database/__init__.py
+database/bestiary_database.py
+database/database_query.py
+database/download_chars.py
+pathfinder_generator.egg-info/PKG-INFO
+pathfinder_generator.egg-info/SOURCES.txt
+pathfinder_generator.egg-info/dependency_links.txt
+pathfinder_generator.egg-info/top_level.txt
