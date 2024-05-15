@@ -1,5 +1,5 @@
 from enum import Enum
-
+import re
 # IMPORT THIS CLASS USING import query.
 # This makes it so that the SQL_OPERATOS
 # and MON macros are imported
@@ -10,7 +10,11 @@ class SQL_OP(Enum):
 	OR =	'OR'
 	LIKE =	'LIKE'
 	IN =	'IN'
-
+	NOT = 'NOT'
+	NOT_IN	 = 	'WHERE NOT IN'
+	AND_NOT_IN = 'AND NOT IN'
+	NOT_EXIST = 'NOT EXIST'
+	NOT_EQUAL = '!='
 
 # Add here common value monster json paths.
 # Levels are represented with .
@@ -22,14 +26,16 @@ class SQL_OP(Enum):
 #  To get to the value frita == test.patata
 
 class MON(Enum):
-	level		= 'system.details.level.value'
-	type		= 'system.details.creatureType'
-	name		= 'name'
-	ac			= 'system.attributes.ac.value'
-	alingment	= 'system.details.alignment.value'
-	traits		= 'system.traits.value'
-	size		= 'system.traits.size.value'
-
+	level			= 'system.details.level.value'
+	type			= 'creatureType'
+	name			= 'name'
+	ac				= 'system.attributes.ac.value'
+	traits			= 'system.traits.value'
+	size			= 'system.traits.size.value'
+	other_speed		= 'type'
+	sense			= 'type'
+	spellcaster		= 'type'#spellcastingEntry
+	special_saves	= 'value'
 class Query():
 
 	@property
@@ -69,16 +75,17 @@ class Query():
 		self._filter_source = []
 		
 	def compose_query(self):
-		source = f'(SELECT * FROM \'{self._table}\' ORDER BY RANDOM())' if self.random else f"'{self._table}'"
+		source = f"'{self._table}'m WHERE "
 		limit = f' LIMIT {self.limit}' if self.limit else ''
 		filter_fields = 'data' if not self._filter_fields else " ".join(self._filter_fields)
-		filter_search = '' if not self._filter_search else ' WHERE ' + " ".join(self._filter_search)
+		filter_search = '' if not self._filter_search else '' + ''.join(self._filter_search)
 		if self._filter_source:
-			source_search = (' AND ' if self._filter_search else 'WHERE ') + f'source IN ({" ".join(self._filter_source)})' 
+			source_search = ('' if self._filter_search else ' ') + f'AND source IN ({" ".join(self._filter_source)})' 
 		else:
 			source_search = ''
 		
-		return f'SELECT {filter_fields} FROM {source} {filter_search}{source_search}{limit}'
+		print (f'SELECT {filter_fields} FROM {source} {filter_search}{source_search}ORDER BY RANDOM(){limit}')
+		return f'SELECT {filter_fields} FROM {source} {filter_search}{source_search}ORDER BY RANDOM(){limit}'
 
 	def __get_query_start(self, previous_filters, previous_content_operator):
 		# Error check the previous content operator and adds it to the query
@@ -90,7 +97,7 @@ class Query():
 				previous_content_operator = previous_content_operator.value
 			else:
 				previous_content_operator = previous_content_operator.upper()
-			if previous_content_operator not in SQL_OP._member_map_:
+			if previous_content_operator not in SQL_OP._value2member_map_:
 				raise(ValueError('Previous operator not in valid operators lists'))
 			#If it's an enum gets it's actual value
 			query_start = previous_content_operator + ' '
@@ -107,10 +114,9 @@ class Query():
 		if arg not in SQL_OP._member_map_:
 			raise(ValueError(f'Invalid argument at index {index}: {arg};\nInvalid operator!'))
 		
-		return arg
-	
-	def __add_filter_statement(self, arg, index):
+		return SQL_OP[arg]
 
+	def __add_filter_statement_specific(self, arg, index):
 		if not isinstance(arg, list) and not isinstance(arg, tuple):
 			raise(ValueError(f'Invalid argument at index {index}: {arg};\nExpected a statement tuple / list!'))
 		#Convert macros to strings and add ' to value if it's a string (with content in it)
@@ -118,9 +124,26 @@ class Query():
 			if (isinstance(element, str) and index + 1 == len(arg) and len(element))
 				else str(element) for index, element in enumerate(arg)]
 		if len(arg) == 3:
-			return f"json_extract(data, '$.{arg[0]}') {arg[1]} {arg[2]}"
+			return f"WHERE json_extract(data, '$.{arg[0]}') {arg[1]} {arg[2]})"
 		elif len(arg) == 2:
-			return f"json_extract(data, '$.{arg[0]}') = {arg[1]}"
+			return f"WHERE json_extract(data, '$.{arg[0]}') = {arg[2]})"
+		else:
+			raise(ValueError(f'Invalid argument at index {index}: {arg};\nNot enough tuple / list elements!'))
+
+	def __add_filter_statement(self, arg, index):
+		if not isinstance(arg, list) and not isinstance(arg, tuple):
+			raise(ValueError(f'Invalid argument at index {index}: {arg};\nExpected a statement tuple / list!'))
+		#Convert macros to strings and add ' to value if it's a string (with content in it)
+		arg = [element.value if isinstance(element, Enum) else f"'{element}'"
+			if (isinstance(element, str) and index + 1 == len(arg) and len(element))
+				else str(element) for index, element in enumerate(arg)]
+		if len(arg) == 3:
+			if arg[1] == '!=':
+				return f"NOT EXISTS( SELECT 1 FROM json_tree(m.data) WHERE key = '{arg[0]}' AND value = {arg[2]})"
+			else:
+				return f"EXISTS(SELECT 1 FROM json_tree(m.data) WHERE key = '{arg[0]}' AND value {arg[1]} {arg[2]})"
+		elif len(arg) == 2:
+			return f"EXISTS(SELECT 1 FROM json_tree(m.data) WHERE key = '{arg[0]}' AND value = {arg[1]})"
 		else:
 			raise(ValueError(f'Invalid argument at index {index}: {arg};\nNot enough tuple / list elements!'))
 
@@ -153,20 +176,24 @@ class Query():
 
 		#le_ = last_element. Used to track what was last inserted
 		for index, arg in enumerate(query_args):
-
 			#Last inserted element was a statement (so the current element should be an operator)
+
 			if le_statement:
 				query_elements.append(self.__add_filter_operator(arg, index))
 				le_operator, le_statement = le_statement, le_operator
 			elif le_operator:
 				#Store the operator and swap operator flags
-				query_elements.append(self.__add_filter_statement(arg, index))
+				if (arg[0] in [MON.level, MON.ac, MON.size]):
+					query_elements.append(self.__add_filter_statement_specific(arg, index))
+				else:					
+					query_elements.append(self.__add_filter_statement(arg, index))
 				le_operator, le_statement = le_statement, le_operator
 		if le_operator: # Checks if there's a dangling operator
 			raise(ValueError('Last query element is a dangling operator!'))
-		final_query = f'{query_start}({" ".join(query_elements)})'
+		final_query = f'{query_start}{" ".join(query_elements)}'
 		self._filter_search.append(final_query)
-
+	
+	
 	def add_source_filter(self, sources_to_filter):
 		if isinstance(sources_to_filter, str):
 			self._filter_source.append(f"'{sources_to_filter}'")
@@ -175,11 +202,10 @@ class Query():
 		else:
 			raise(TypeError('Invalid source argument!'))
 
-
-if __name__ == "__main__":
-	query = Query('monsters')
-	query.add_filter((MON.level, 15))
-	query.add_source_filter('pathfinder-bestiary')
+#if __name__ == "__main__":
+#	query = Query('monsters')
+#	query.add_filter((MON.level, 15))
+#	query.add_source_filter('pathfinder-bestiary')
 	# query.add_filter((MON.AC, '<=', 14), 'AND', (MON.Type, 'Dragon'), previous_content_operator='OR')
 
-	print(query.compose_query())
+#	print(query.compose_query())

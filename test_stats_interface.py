@@ -4,7 +4,7 @@ if __name__ == "__main__":
 	from infoFrame.infoFrame import InfoFrame
 	from creature.database_creature import *
 	from creature.player import *
-	from encounterMode.encounterMode import EncounterMode
+	from GUI.encounterMode import EncounterMode
 	from bs4 import BeautifulSoup
 
 

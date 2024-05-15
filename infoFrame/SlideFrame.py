@@ -42,7 +42,7 @@ class SlideFrame():
 	def insert_image(self, img):
 		self._textWidget.image_create(tk.END, image = img)
 
-	def pack(self, row = 2, column=0, rowspan=1, columnspan=1, sticky='nswe'):
+	def pack(self, row = 1, column=0, rowspan=1, columnspan=1, sticky='nswe'):
 		self._textWidget.grid(row=row, column=column, rowspan=rowspan, columnspan=columnspan, sticky=sticky)
 		self._scrollbar.grid(row=row, column=column+1, rowspan=rowspan, sticky='nswe')
 

@@ -46,30 +46,32 @@ class EncounterMode():
 			self._creatures[-1]._frame.grid_configure(pady = 10)
 			self._creatures[-1].index = len(self._creatures) - 1
 
+#TODO CAMBIAR EL QUERRY PARA QUE MATCHEE CON LOS CAMBIOS YA QUE TENGO LA LISTA DE MONSTRUOS
+	
 	def add_database_monster(self, database_name, rename = None):
 		query = Query('monsters')
 		query.add_filter((MON.name, database_name))
 
 		monster_raw = self._database.search(query.compose_query())
-		if monster_raw:
-			monster = DatabaseCreature(self, self._creatures_frame, self._infoFrame, monster_raw[0])
-			self._creatures.append(monster)
-
-			# Handle name update
-			if rename:
-				self._creatures[-1].change_name(rename)
-			else:
-				# If duplicated, name them differently (#2, #3...)
-				self._creature_names.append(monster_raw[0]['name'])
-				count = len([name for name in self._creature_names if name == monster_raw[0]['name']])
-				if count > 1:
-					self._creatures[-1].change_name(monster_raw[0]['name'] + f' #{count}')
-				
-			self._creatures[-1]._frame.grid()
-			self._creatures[-1]._frame.grid_configure(pady = 10)
-			self._creatures[-1].index = len(self._creatures) - 1
+		self.add_raw_monster(monster_raw, rename)
+		
+		
+	def add_raw_monster(self, monster_raw, rename = None):
+		monster = DatabaseCreature(self, self._creatures_frame, self._infoFrame, monster_raw[0])
+		self._creatures.append(monster)
+		# Handle name update
+		if rename:
+			self._creatures[-1].change_name(rename)
 		else:
-			print('Monster not found:', database_name)
+			# If duplicated, name them differently (#2, #3...)
+			self._creature_names.append(monster_raw[0]['name'])
+			count = len([name for name in self._creature_names if name == monster_raw[0]['name']])
+			if count > 1:
+				self._creatures[-1].change_name(monster_raw[0]['name'] + f' #{count}')
+			
+		self._creatures[-1]._frame.grid()
+		self._creatures[-1]._frame.grid_configure(pady = 10)
+		self._creatures[-1].index = len(self._creatures) - 1
 	
 	def _sort_by_initiative(self):
 		creatures = sorted(self._creatures, key=lambda d: d.initiative)
