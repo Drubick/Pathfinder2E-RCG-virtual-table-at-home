@@ -52,7 +52,8 @@ class Map:
     def update_grid(self, scale):
         self._scale = int(self._scale_combox.get())
         self._canvas.delete('all')
-        self.draw_grid()
+        if self._scale != 1:
+            self.draw_grid()
         self.draw_map()
 
     def import_map(self):
@@ -64,6 +65,8 @@ class Map:
     def draw_map(self):
         if self._map_image_path is None:
             return 
+        if self._scale == 1:
+            self._canvas.delete('all')
         canvas_width = self._canvas.winfo_width()
         canvas_height = self._canvas.winfo_height()
         pillow_image = Image.open(self._map_image_path)
@@ -71,14 +74,15 @@ class Map:
         self._map_image = ImageTk.PhotoImage(pillow_image)
         self._canvas.delete("map")
         self._canvas.create_image(0, 0, image=self._map_image, anchor='nw')
-        self.draw_grid()  # Call draw_grid after create_image
+        if self._scale != 1:
+            self.draw_grid()  # Call draw_grid after create_image
 
 #This method will create the widgets to select the options for the map
     def widgets_option(self):
         #selects the size of the square grid
         self._scale_label = ttk.Label(self._frame, text="Select the square size of the grid:")
         self._scale_label.pack(anchor='w')
-        self._scale_values  = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+        self._scale_values  = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         self._scale_combox = ttk.Combobox(self._frame, values=self._scale_values)
         self._scale_combox.set(self._scale)
         self._scale_combox.bind('<<ComboboxSelected>>', self.update_grid)
