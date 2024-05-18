@@ -181,7 +181,7 @@ class DatabaseCreature(Creature):
 			self.attacks[attack_type][item['name']] = {
 				'bonus':			self._get_attack_bonus(item),
 				'damageRolls':		[],
-				'traits':			item['system']['traits']['value'],
+				'traits':			item['system'].get('traits', {'value':None})['value'],
 				'attack-effects':	item['system']['attackEffects']
 			}
 			for damage_type in item['system']['damageRolls'].values():
@@ -233,11 +233,11 @@ class DatabaseCreature(Creature):
 
 	def _get_runes(self, item):
 		return {
-			'potency_level':	item['system']['potencyRune']['value'],
-			'property_rune_1': 	item['system']['propertyRune1']['value'],
-            'property_rune_2': 	item['system']['propertyRune2']['value'],
-            'property_rune_3': 	item['system']['propertyRune3']['value'],
-            'property_rune_4': 	item['system']['propertyRune4']['value']
+			'potency_level':	item['system'].get('potencyRune', {'value':None})['value'],
+			'property_rune_1': 	item['system'].get('propertyRune1', {'value':None})['value'],
+            'property_rune_2': 	item['system'].get('propertyRune2', {'value':None})['value'],
+            'property_rune_3': 	item['system'].get('propertyRune3', {'value':None})['value'],
+            'property_rune_4': 	item['system'].get('propertyRune4', {'value':None})['value']
 		}
 
 	def parse_json_armor(self, item):
@@ -249,9 +249,9 @@ class DatabaseCreature(Creature):
 			'require_strength':	item['system']['strength'],
 			'speed_penalty':	item['system']['speedPenalty'],
 			'quantity':			item['system']['quantity'],
-			'traits':			item['system']['traits']['value'],
-			'usage':			item['system']['usage']['value'],
-			'price':			item['system']['price']['value'],
+			'traits':			item['system'].get('traits', {'value':None})['value'],
+			'usage':			item['system'].get('usage', {'value':None})['value'],
+			'price':			item['system'].get('price', {'value':None})['value'],
 			'runes':			self._get_runes(item)
 		}
 
@@ -261,22 +261,22 @@ class DatabaseCreature(Creature):
 			'description':	BeautifulSoup(item['system']['description']['value'], 'html.parser').get_text('').strip('\n'),
 			'hp':			item['system']['hp']['max'],
 			'quantity':		item['system']['quantity'],
-			'traits':		item['system']['traits']['value'],
-			'usage':		item['system']['usage']['value'],
-			'price':		item['system']['price']['value'],
+			'traits':		item['system'].get('traits', {'value':None})['value'],
+			'usage':		item['system'].get('usage', {'value':None})['value'],
+			'price':		item['system'].get('price', {'value':None})['value'],
 			'runes':		self._get_runes(item)
 		}
 
 	def parse_json_consumable(self, item):
 		self.consumables[item['name']] = {
-			'type':				item['system']['consumableType']['value'],
+			'type':				item['system'].get('price', {'value':None})['value'],
 			'quantity':			item['system']['quantity'],
 			'description':		BeautifulSoup(item['system']['description']['value'], 'html.parser').get_text('').strip('\n'),
-			'charges':			item['system']['charges']['value'],
-			'consume':			item['system']['consume'],
+			'charges':			item['system'].get('charges', {'value':None})['value'],
+			'consume':			item['system'].get('consume', {'value':None}),
 			'quantity':			item['system']['quantity'],
-			'traits':			item['system']['traits']['value'],
-			'usage':			item['system']['usage']['value'],
+			'traits':			item['system'].get('traits', {'value':None})['value'],
+			'usage':			item['system'].get('usage', {'value':None})['value'],
 			'price':			item['system']['price']['value']
 		}
 
@@ -285,8 +285,8 @@ class DatabaseCreature(Creature):
 			'quantity':			item['system']['quantity'],
 			'description':		BeautifulSoup(item['system']['description']['value'], 'html.parser').get_text('').strip('\n'),
 			'quantity':			item['system']['quantity'],
-			'traits':			item['system']['traits']['value'],
-			'usage':			item['system']['usage']['value'],
+			'traits':			item['system'].get('traits', {'value':None})['value'],
+			'usage':			item['system'].get('usage', {'value':None})['value'],
 			'price':			item['system']['price']['value']
 		}
 

@@ -484,7 +484,7 @@ if __name__ == "__main__":
 	"familiars": []
 })
 	# encounter.add_database_monster('Choral')
-	encounter.add_database_monster('Ancient Red Dragon')
+	encounter.add_database_monster('Frost Giant')
 
 	# iFrame = InfoFrame(database, root)
 

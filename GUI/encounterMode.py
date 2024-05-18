@@ -15,6 +15,7 @@ class EncounterMode():
 
 		self._creatures_frame = ttk.Frame(self._frame, borderwidth=10)
 		
+		self._frame.pack(expand=True, fill='both')
 		# Configure frame so the widgets expand when the parent frame is resized
 		self._frame.grid_columnconfigure(0, weight=7)
 		self._frame.grid_columnconfigure(1, weight=3)
@@ -52,22 +53,25 @@ class EncounterMode():
 		query = Query('monsters')
 		query.add_filter((MON.name, database_name))
 
-		monster_raw = self._database.search(query.compose_query())
-		self.add_raw_monster(monster_raw, rename)
+		
+		if monster_raw := self._database.search(query.compose_query()):
+			self.add_raw_monster(monster_raw[0], rename)
+		else:
+			raise ValueError(f'Monster {database_name} not found in the database')
 		
 		
 	def add_raw_monster(self, monster_raw, rename = None):
-		monster = DatabaseCreature(self, self._creatures_frame, self._infoFrame, monster_raw[0])
+		monster = DatabaseCreature(self, self._creatures_frame, self._infoFrame, monster_raw)
 		self._creatures.append(monster)
 		# Handle name update
 		if rename:
 			self._creatures[-1].change_name(rename)
 		else:
 			# If duplicated, name them differently (#2, #3...)
-			self._creature_names.append(monster_raw[0]['name'])
-			count = len([name for name in self._creature_names if name == monster_raw[0]['name']])
+			self._creature_names.append(monster_raw['name'])
+			count = len([name for name in self._creature_names if name == monster_raw['name']])
 			if count > 1:
-				self._creatures[-1].change_name(monster_raw[0]['name'] + f' #{count}')
+				self._creatures[-1].change_name(monster_raw['name'] + f' #{count}')
 			
 		self._creatures[-1]._frame.grid()
 		self._creatures[-1]._frame.grid_configure(pady = 10)
@@ -130,3 +134,9 @@ class EncounterMode():
 		del self._creatures[index]
 		for i in range(index, len(self._creatures)):
 			self._creatures[i].index = i
+	
+	def has_monster(self, monster):
+		return monster in self._creatures
+	
+	def clear(self):
+		self._creatures = []

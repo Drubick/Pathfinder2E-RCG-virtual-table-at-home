@@ -8,12 +8,17 @@ from infoFrame.MonsterFrame import MonsterFrame
 from database import *
 
 
-
+#This is a class that creates a tkinter interface displayed in a 3 column grid, that it allows the user
+#to search for different items in the database (primary monsters), and display them in the middle column.
+#it will also store the finded items in a list that can be used later.(the list is a dictionary of json objects)
 class Item_search():
+    #This method will show the items in the middle column of the interface
     def show_items(self, item_list):
         self._monster_frame.update_monsters([item['name'] for item in item_list])
 
-
+    #This method will generate an encounter based on the user input, 
+    #it will store the monsters in a list that can be used later and display the monsters in the middle column    
+    #TODO: check for errors, sometimes this function will not work as intended
     def generateEncounter(self):
         party_level = int(self._select_party_level.get())
         party_size = int(self._select_party_size.get())
@@ -22,7 +27,10 @@ class Item_search():
 
         self._generator.generate(party_size, party_level, treath)
         self.show_items(self._generator._monster_list)
-
+        self._monster_list += self._generator._monster_list
+        
+#When this method is called it will create an expandable option menu that will allow the user to select the traits of the monster he wants to search for.
+#it will also create a button that will call the search method. allowing to search in the database
     def displayOptions(self):
         #Select flying monsters
         self._search=ttk.Button(self._frame, text='Search', command=self.search)
@@ -68,12 +76,13 @@ class Item_search():
         self._special_saves_false = Radiobutton(self._frame, text="No", variable = self._special_saves, value=False)
         self._special_saves_false.grid(row=13, column=0, sticky='ES')
 
-   
-    #TODO SEPARATE THIS FUNCTION INTO ANOTHER DIFFERENT CLASS THAT WILL JUST ACT AS AN SEARCHER FOR VARIOUS THINGS IN THE DIFFERENT ATABASES    
+#This method allows the user to search for a monster with specific traits in the database.
+#TODO simplifly the code by extrapolating the can_fly can_swim etc. to a list of traits or 
+#TODO something similar and use the getters in the same method where they are created if possible
     def search(self):
         query = Query("monsters")
         query.add_source_filter('pathfinder-bestiary')
-        query.limit = 2
+        query.limit = 10
         can_fly = self._can_fly.get() 
         can_swim = self._can_swim.get()
         has_darkvision = self._has_darkvision.get()
@@ -85,16 +94,21 @@ class Item_search():
         query.add_filter([MON.spellcaster, '=' if can_spellcast else '!='  ,'spellcastingEntry'],  previous_content_operator =  SQL_OP.AND)
         #query.add_filter([MON.special_saves, '!=' if special_saves else '='  ,' '],                 previous_content_operator =  SQL_OP.AND)
         
+        #Creating a list of monsters, first empty in case we dont find anything
         monster_list = []
         monster_list += self._database.search(query.compose_query())
 
-
         self.show_items(monster_list)
+        self._monster_list += monster_list
 
+#TODO further separate the init into functions, so the interface is not generated at the calling
+#of the class and the class can be used in a more modular way, (maybe create a function that generates the interface)??
     def __init__(self, root):
 
         self._frame = ttk.Frame(root)
+        self._frame.pack(expand=True, fill='both')
         self._database = Database()
+        self._monster_list = []
         self._frame.grid_columnconfigure(0, weight = 2)
         self._frame.grid_columnconfigure(1, weight = 7)
         self._frame.grid_columnconfigure(2, weight = 2)

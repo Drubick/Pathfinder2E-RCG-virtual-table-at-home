@@ -295,7 +295,6 @@ if __name__ == "__main__":
 			'actions',
 			'ancestries',
 			'spell-effects',
-			'spell-effects',
 			'spells'
 		)
 		for table in  tables_to_load:
