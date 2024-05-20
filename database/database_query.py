@@ -65,6 +65,7 @@ class Query():
 		
 	def __init__(self, table) -> None:
 		self._table = table
+		self._only_one_filter = True
 		self.reset()
 
 	def reset(self):
@@ -75,10 +76,16 @@ class Query():
 		self._filter_source = []
 		
 	def compose_query(self):
-		source = f"'{self._table}'m WHERE "
+		#check if there are more than 1 filter
+		if len(self._filter_search) > 1:
+			self._only_one_filter = False
+		source = f"'{self._table}'m "
 		limit = f' LIMIT {self.limit}' if self.limit else ''
 		filter_fields = 'data' if not self._filter_fields else " ".join(self._filter_fields)
 		filter_search = '' if not self._filter_search else '' + ''.join(self._filter_search)
+
+		if self._filter_search and not any(field in self._filter_search[0] for field in ['level', 'ac', 'size']):
+			source += ' WHERE'
 		if self._filter_source:
 			source_search = ('' if self._filter_search else ' ') + f'AND source IN ({" ".join(self._filter_source)})' 
 		else:
@@ -124,9 +131,16 @@ class Query():
 			if (isinstance(element, str) and index + 1 == len(arg) and len(element))
 				else str(element) for index, element in enumerate(arg)]
 		if len(arg) == 3:
-			return f"WHERE json_extract(data, '$.{arg[0]}') {arg[1]} {arg[2]})"
+			if self._only_one_filter :
+				return f"WHERE json_extract(data, '$.{arg[0]}') {arg[1]} {arg[2]} "
+			else:
+				return f"WHERE json_extract(data, '$.{arg[0]}') {arg[1]} {arg[2]})"
 		elif len(arg) == 2:
-			return f"WHERE json_extract(data, '$.{arg[0]}') = {arg[2]})"
+			if self._only_one_filter:
+				return f"WHERE json_extract(data, '$.{arg[0]}') = {arg[1]} "
+			else:
+				return f"WHERE json_extract(data, '$.{arg[0]}') = {arg[1]})"
+				
 		else:
 			raise(ValueError(f'Invalid argument at index {index}: {arg};\nNot enough tuple / list elements!'))
 

@@ -5,6 +5,8 @@ from creature.player			import Player
 from database.bestiary_database	import Database
 from database.database_query	import *
 
+
+#TODO ADD A SCROLLBAR TO THE CREATURES FRAME
 class EncounterMode():
 	def __init__(self, root, database:Database) -> None:
 		self._database = database
@@ -29,6 +31,7 @@ class EncounterMode():
 
 		#Render the different widgets
 		self._creatures_frame.grid(row=1, column=0, sticky= 'NSEW')
+		self._creatures_frame
 		self._infoFrame._frame.grid(row=0, column=1, rowspan=3, sticky='NSEW')
 
 	def add_player(self, raw_data):

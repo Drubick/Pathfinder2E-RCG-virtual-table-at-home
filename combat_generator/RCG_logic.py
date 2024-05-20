@@ -51,6 +51,8 @@ class Generator:
 			return 3
 		elif xp >= 120 and xp <= 160:
 			return 4
+		else:
+			return 4
 
 	def determine_monster_xp(self, monster_level):
 		monster_level_diff = monster_level - self._party_level
