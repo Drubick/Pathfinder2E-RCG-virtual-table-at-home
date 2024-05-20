@@ -82,7 +82,7 @@ class Item_search():
     def search(self):
         query = Query("monsters")
         query.add_source_filter('pathfinder-bestiary')
-        query.limit = 10
+        query.limit = 1
         can_fly = self._can_fly.get() 
         can_swim = self._can_swim.get()
         has_darkvision = self._has_darkvision.get()

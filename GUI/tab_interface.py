@@ -44,7 +44,7 @@ class Tabs_interface:
         #TODO??  A WAY TO PREGENERATE AND SAVE A MAP FOR LATER USES OPENING IT IN A NEW TAB???
         self.tab3 = ttk.Frame(self._notebook)
         self._notebook.add(self.tab3, text='Tab 3')
-        self._map = Map(self.tab3)
+        self._map = Map(self.tab3,  self._creature_selection._monster_list)
        
         self._notebook.pack(expand=True, fill='both')
         self._notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
@@ -54,7 +54,9 @@ class Tabs_interface:
     def on_tab_changed(self, event):
         selected_tab_index = self._notebook.index(self._notebook.select())
         if selected_tab_index == 2:
+            self._map._monster_list = self._creature_selection._monster_list
             self._map.draw_grid()
+            self._map.refresh_monster_interface()
         if selected_tab_index == 1:  # tab indices are 0-based, so tab2 is at index 1
             self.add_database_monster()
         if selected_tab_index == 0:
